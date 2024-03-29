@@ -1,0 +1,785 @@
+###right side view###
+
+import java.util.*;
+
+class TreeNode {
+    int val;
+    TreeNode left, right;
+
+    public TreeNode(int value) {
+        val = value;
+        left = right = null;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Input format: space-separated integers representing the tree nodes
+        String input = scanner.nextLine().trim();
+        String[] nodes = input.split(" ");
+
+        TreeNode root = buildTree(nodes);
+
+        List<Integer> rightSideView = rightSideView(root);
+        System.out.println("Right side view of the tree: " + rightSideView);
+    }
+
+    // Function to construct binary tree from given array
+    public static TreeNode buildTree(String[] nodes) {
+        if (nodes == null || nodes.length == 0 || nodes[0].equals("null"))
+            return null;
+
+        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+
+        for (int i = 1; i < nodes.length; i += 2) {
+            TreeNode parent = queue.poll();
+
+            if (!nodes[i].equals("null")) {
+                parent.left = new TreeNode(Integer.parseInt(nodes[i]));
+                queue.add(parent.left);
+            }
+
+            if (i + 1 < nodes.length && !nodes[i + 1].equals("null")) {
+                parent.right = new TreeNode(Integer.parseInt(nodes[i + 1]));
+                queue.add(parent.right);
+            }
+        }
+        return root;
+    }
+
+    // Function to get right side view of binary tree
+    public static List<Integer> rightSideView(TreeNode root) {
+        List<Integer> result = new ArrayList<>();
+        if (root == null) return result;
+
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                if (i == 0) result.add(node.val); // Rightmost node
+                if (node.right != null) queue.add(node.right);
+                if (node.left != null) queue.add(node.left);
+            }
+        }
+        return result;
+    }
+}
+
+
+
+###boundary traversal###
+
+import java.util.*;
+
+class TreeNode {
+    int val;
+    TreeNode left, right;
+
+    public TreeNode(int value) {
+        val = value;
+        left = right = null;
+    }
+}
+
+public class Main{
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Input format: space-separated integers representing the tree nodes
+        String input = scanner.nextLine().trim();
+        String[] nodes = input.split(" ");
+
+        TreeNode root = buildTree(nodes);
+
+        System.out.println("Boundary Traversal of the Binary Tree:");
+        boundaryTraversal(root);
+    }
+
+    // Function to construct binary tree from given array
+    public static TreeNode buildTree(String[] nodes) {
+        if (nodes == null || nodes.length == 0 || nodes[0].equals("null"))
+            return null;
+
+        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+
+        for (int i = 1; i < nodes.length; i += 2) {
+            TreeNode parent = queue.poll();
+
+            if (!nodes[i].equals("null")) {
+                parent.left = new TreeNode(Integer.parseInt(nodes[i]));
+                queue.add(parent.left);
+            }
+
+            if (i + 1 < nodes.length && !nodes[i + 1].equals("null")) {
+                parent.right = new TreeNode(Integer.parseInt(nodes[i + 1]));
+                queue.add(parent.right);
+            }
+        }
+        return root;
+    }
+
+    // Function for boundary traversal of binary tree
+    public static void boundaryTraversal(TreeNode root) {
+        if (root == null)
+            return;
+
+        System.out.print(root.val + " ");
+
+        printLeftBoundary(root.left);
+        printLeaves(root.left);
+        printLeaves(root.right);
+        printRightBoundary(root.right);
+    }
+
+    // Function to print the left boundary of the binary tree
+    private static void printLeftBoundary(TreeNode node) {
+        if (node == null || (node.left == null && node.right == null))
+            return;
+
+        System.out.print(node.val + " ");
+
+        if (node.left != null)
+            printLeftBoundary(node.left);
+        else
+            printLeftBoundary(node.right);
+    }
+
+    // Function to print the right boundary of the binary tree
+    private static void printRightBoundary(TreeNode node) {
+        if (node == null || (node.left == null && node.right == null))
+            return;
+
+        if (node.right != null)
+            printRightBoundary(node.right);
+        else
+            printRightBoundary(node.left);
+
+        System.out.print(node.val + " ");
+    }
+
+    // Function to print the leaves of the binary tree
+    private static void printLeaves(TreeNode node) {
+        if (node == null)
+            return;
+
+        printLeaves(node.left);
+
+        if (node.left == null && node.right == null)
+            System.out.print(node.val + " ");
+
+        printLeaves(node.right);
+    }
+}
+
+###dials/djikstra###
+
+import java.util.*;
+
+public class Main {
+    static final int INF = Integer.MAX_VALUE;
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Input format: number of vertices, number of edges, followed by edge details
+        String input = scanner.nextLine().trim();
+        String[] inputs = input.split(" ");
+
+        int vertices = Integer.parseInt(inputs[0]);
+        int edges = Integer.parseInt(inputs[1]);
+
+        List<Edge>[] graph = new ArrayList[vertices];
+        for (int i = 0; i < vertices; i++) {
+            graph[i] = new ArrayList<>();
+        }
+
+        for (int i = 0; i < edges; i++) {
+            input = scanner.nextLine().trim();
+            inputs = input.split(" ");
+            int source = Integer.parseInt(inputs[0]);
+            int destination = Integer.parseInt(inputs[1]);
+            int weight = Integer.parseInt(inputs[2]);
+            graph[source].add(new Edge(destination, weight));
+            graph[destination].add(new Edge(source, weight));
+        }
+
+        input = scanner.nextLine().trim();
+        int source = Integer.parseInt(input);
+
+        int[] distances = dijkstra(graph, source);
+        System.out.println("Shortest distances from vertex " + source + ":");
+        for (int i = 0; i < vertices; i++) {
+            System.out.println("Vertex " + i + ": " + distances[i]);
+        }
+    }
+
+    static class Edge {
+        int destination, weight;
+
+        public Edge(int destination, int weight) {
+            this.destination = destination;
+            this.weight = weight;
+        }
+    }
+
+    static int[] dijkstra(List<Edge>[] graph, int source) {
+        int vertices = graph.length;
+        int[] distances = new int[vertices];
+        Arrays.fill(distances, INF);
+        distances[source] = 0;
+
+        PriorityQueue<Edge> minHeap = new PriorityQueue<>(Comparator.comparingInt(e -> e.weight));
+        minHeap.offer(new Edge(source, 0));
+
+        while (!minHeap.isEmpty()) {
+            Edge current = minHeap.poll();
+            int currentVertex = current.destination;
+            int currentDistance = current.weight;
+
+            if (currentDistance > distances[currentVertex]) continue;
+
+            for (Edge neighbor : graph[currentVertex]) {
+                int newDistance = currentDistance + neighbor.weight;
+                if (newDistance < distances[neighbor.destination]) {
+                    distances[neighbor.destination] = newDistance;
+                    minHeap.offer(new Edge(neighbor.destination, newDistance));
+                }
+            }
+        }
+
+        return distances;
+    }
+}
+
+
+
+
+##Recover BST###
+
+import java.util.*;
+
+class Node {
+    int val;
+    Node left, right;
+
+    Node(int item) {
+        val = item;
+        left = right = null;
+    }
+}
+
+public class Main {
+    Node first, middle, last, prev;
+
+    void recoverBSTUtil(Node root) {
+        if (root != null) {
+            recoverBSTUtil(root.left);
+
+            if (prev != null && root.val < prev.val) {
+                if (first == null) {
+                    first = prev;
+                    middle = root;
+                } else
+                    last = root;
+            }
+
+            prev = root;
+
+            recoverBSTUtil(root.right);
+        }
+    }
+
+    void recoverBST(Node root) {
+        first = middle = last = prev = null;
+
+        recoverBSTUtil(root);
+
+        if (first != null && last != null) {
+            int temp = first.val;
+            first.val = last.val;
+            last.val = temp;
+        } else if (first != null && middle != null) {
+            int temp = first.val;
+            first.val = middle.val;
+            middle.val = temp;
+        }
+    }
+
+    void printInorder(Node node) {
+        if (node == null)
+            return;
+
+        printInorder(node.left);
+        System.out.print(node.val + " ");
+        printInorder(node.right);
+    }
+
+    public static void main(String[] args) {
+        Main s = new Main();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter nodes as a space-separated string:");
+        String str = scanner.nextLine();
+        String[] nodes = str.split(" ");
+
+        // Assuming the input is a level order traversal of the BST
+        Node[] nodeArray = new Node[nodes.length];
+        for (int i = 0; i < nodes.length; i++) {
+            nodeArray[i] = new Node(Integer.parseInt(nodes[i]));
+        }
+
+        for (int i = 0; i < nodes.length; i++) {
+            if (2*i + 1 < nodes.length) nodeArray[i].left = nodeArray[2*i + 1];
+            if (2*i + 2 < nodes.length) nodeArray[i].right = nodeArray[2*i + 2];
+        }
+
+        System.out.println("Original BST:");
+        s.printInorder(nodeArray[0]);
+
+        s.recoverBST(nodeArray[0]);
+
+        System.out.println("\nRecovered BST:");
+        s.printInorder(nodeArray[0]);
+
+        scanner.close();
+    }
+}
+
+###BFS, DFS####
+
+import java.util.Scanner;
+
+public class Main {
+    public void bfs(String str) {
+        String[] nodes = str.split(" ");
+        System.out.println("BFS: ");
+        for (String node : nodes) {
+            if (!node.equals("-1")) {
+                System.out.print(node + " ");
+            }
+        }
+    }
+
+    public void dfs(String str) {
+        String[] nodes = str.split(" ");
+        System.out.println("\nDFS: ");
+        dfsHelper(nodes, 0);
+    }
+
+    private void dfsHelper(String[] nodes, int i) {
+        if (i >= nodes.length || nodes[i].equals("-1")) return;
+        dfsHelper(nodes, 2*i + 1); // left child
+        dfsHelper(nodes, 2*i + 2); // right child
+        System.out.print(nodes[i] + " "); // parent
+    }
+
+    public static void main(String[] args) {
+        Main s = new Main();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter nodes as a space-separated string:");
+        String str = scanner.nextLine();
+        s.bfs(str);
+        s.dfs(str);
+    }
+}
+
+####vertical#####
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String str = "1 2 3 4 5 6 7";
+        String[] nums = str.split(" ");
+        List<List<Integer>> lists = new ArrayList<>();
+
+        for (int i = 0; i < nums.length; i++) {
+            int hd = getHorizontalDistance(i);
+            while (lists.size() <= hd + nums.length) {
+                lists.add(new ArrayList<>());
+            }
+            lists.get(hd + nums.length).add(Integer.parseInt(nums[i]));
+        }
+
+        for (List<Integer> list : lists) {
+            if (!list.isEmpty()) {
+                System.out.println(list);
+            }
+        }
+    }
+
+    private static int getHorizontalDistance(int i) {
+        int hd = 0;
+        while (i > 0) {
+            hd = (i % 2 == 0) ? hd - 1 : hd + 1;
+            i = (i - 1) / 2;
+        }
+        return hd;
+    }
+}
+
+
+###Bellman##
+
+import java.util.*;
+
+class Main {
+    static void BellmanFord(int[][] edges, int V, int src) {
+        int[] dist = new int[V];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
+
+        for (int i = 1; i < V; ++i) {
+            for (int[] edge : edges) {
+                int u = edge[0];
+                int v = edge[1];
+                int weight = edge[2];
+                if (dist[u] != Integer.MAX_VALUE && dist[u] + weight < dist[v]) {
+                    dist[v] = dist[u] + weight;
+                }
+            }
+        }
+
+        for (int[] edge : edges) {
+            int u = edge[0];
+            int v = edge[1];
+            int weight = edge[2];
+            if (dist[u] != Integer.MAX_VALUE && dist[u] + weight < dist[v]) {
+                System.out.println("Graph contains negative weight cycle");
+                return;
+            }
+        }
+
+        printArr(dist, V);
+    }
+
+    static void printArr(int dist[], int V) {
+        System.out.println("Vertex Distance from Source");
+        for (int i = 0; i < V; ++i)
+            System.out.println(i + "\t\t" + dist[i]);
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int E = scanner.nextInt(); // Number of edges in graph
+        scanner.nextLine(); // Consume newline left-over
+        int[][] edges = new int[E][3];
+        for (int i = 0; i < E; i++) {
+            String input = scanner.nextLine();
+            String[] parts = input.split(" ");
+            edges[i][0] = Integer.parseInt(parts[0]);
+            edges[i][1] = Integer.parseInt(parts[1]);
+            edges[i][2] = Integer.parseInt(parts[2]);
+        }
+
+        int V = 5; // Number of vertices in graph
+        BellmanFord(edges, V, 0);
+    }
+}
+
+##Topological sort##
+
+import java.util.*;
+
+class Graph {
+    private final int V;
+    private final List<List<Integer>> adj;
+
+    public Graph(int V) {
+        this.V = V;
+        adj = new ArrayList<>(V);
+        for (int i = 0; i < V; i++)
+            adj.add(new LinkedList<>());
+    }
+
+    public void addEdge(int source, int dest) {
+        adj.get(source).add(dest);
+    }
+
+    public void topologicalSort() {
+        Stack<Integer> stack = new Stack<>();
+        boolean[] visited = new boolean[V];
+        for (int i = 0; i < V; i++)
+            visited[i] = false;
+        for (int i = 0; i < V; i++)
+            if (!visited[i])
+                topologicalSortUtil(i, visited, stack);
+        while (!stack.empty())
+            System.out.print(stack.pop() + " ");
+    }
+
+    public void topologicalSortUtil(int v, boolean[] visited, Stack<Integer> stack) {
+        visited[v] = true;
+        Integer i;
+        Iterator<Integer> it = adj.get(v).iterator();
+        while (it.hasNext()) {
+            i = it.next();
+            if (!visited[i])
+                topologicalSortUtil(i, visited, stack);
+        }
+        stack.push(v);
+    }
+
+    public static void main(String args[]) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the number of vertices:");
+        int v = scanner.nextInt();
+        Graph graph = new Graph(v);
+        System.out.println("Enter the number of edges:");
+        int e = scanner.nextInt();
+        System.out.println("Enter the edges (source destination):");
+        for (int i = 0; i < e; i++) {
+            int source = scanner.nextInt();
+            int dest = scanner.nextInt();
+            graph.addEdge(source, dest);
+        }
+        System.out.println("Topological sort of the given graph is:");
+        graph.topologicalSort();
+    }
+}
+
+
+###Heap sort###
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter a space-separated list of integers:");
+        String[] input = scanner.nextLine().split(" ");
+        int[] array = Arrays.stream(input).mapToInt(Integer::parseInt).toArray();
+
+        heapSort(array);
+
+        // Print the sorted array in the specified format
+        for (int i = 0; i < array.length; i++) {
+            System.out.print(array[i]);
+            if (i < array.length - 1) {
+                System.out.print(" ");
+            }
+        }
+    }
+
+    public static void heapSort(int[] array) {
+        int n = array.length;
+
+        // Build heap
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            heapify(array, n, i);
+        }
+
+        // One by one extract an element from heap
+        for (int i = n - 1; i >= 0; i--) {
+            // Move current root to end
+            int temp = array[0];
+            array[0] = array[i];
+            array[i] = temp;
+
+            // Call max heapify on the reduced heap
+            heapify(array, i, 0);
+        }
+    }
+
+    public static void heapify(int[] array, int n, int i) {
+        int largest = i; // Initialize largest as root
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+
+        // If left child is larger than root
+        if (left < n && array[left] > array[largest]) {
+            largest = left;
+        }
+
+        // If right child is larger than largest so far
+        if (right < n && array[right] > array[largest]) {
+            largest = right;
+        }
+
+        // If largest is not root
+        if (largest != i) {
+            int swap = array[i];
+            array[i] = array[largest];
+            array[largest] = swap;
+
+            // Recursively heapify the affected sub-tree
+            heapify(array, n, largest);
+        }
+    }
+}
+
+
+###Binomial sort###
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter a space-separated list of integers:");
+        String[] input = scanner.nextLine().split(" ");
+        int[] array = Arrays.stream(input).mapToInt(Integer::parseInt).toArray();
+
+        heapSort(array);
+
+        // Print the sorted array in the specified format
+        for (int i = 0; i < array.length; i++) {
+            System.out.print(array[i]);
+            if (i < array.length - 1) {
+                System.out.print(" ");
+            }
+        }
+    }
+
+    public static void heapSort(int[] array) {
+        int n = array.length;
+
+        // Build heap
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            heapify(array, n, i);
+        }
+
+        // One by one extract an element from heap
+        for (int i = n - 1; i >= 0; i--) {
+            // Move current root to end
+            int temp = array[0];
+            array[0] = array[i];
+            array[i] = temp;
+
+            // Call max heapify on the reduced heap
+            heapify(array, i, 0);
+        }
+    }
+
+    public static void heapify(int[] array, int n, int i) {
+        int largest = i; // Initialize largest as root
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+
+        // If left child is larger than root
+        if (left < n && array[left] > array[largest]) {
+            largest = left;
+        }
+
+        // If right child is larger than largest so far
+        if (right < n && array[right] > array[largest]) {
+            largest = right;
+        }
+
+        // If largest is not root
+        if (largest != i) {
+            int swap = array[i];
+            array[i] = array[largest];
+            array[largest] = swap;
+
+            // Recursively heapify the affected sub-tree
+            heapify(array, n, largest);
+        }
+    }
+}
+
+###K array heap###
+
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class KaryHeap {
+    private int[] heap;
+    private int k; // Branching factor
+
+    public KaryHeap(int[] inputArray, int k) {
+        this.k = k;
+        this.heap = Arrays.copyOf(inputArray, inputArray.length);
+        buildHeap();
+    }
+
+    private void buildHeap() {
+        // Start from the last non-leaf node and move up
+        for (int i = (heap.length - 2) / k; i >= 0; i--) {
+            restoreDown(i);
+        }
+    }
+
+    private void restoreDown(int index) {
+        int largest = index;
+        for (int child = (k * index) + 1; child <= (k * index) + k; child++) {
+            if (child < heap.length && heap[child] > heap[largest]) {
+                largest = child;
+            }
+        }
+        if (largest != index) {
+            swap(index, largest);
+            restoreDown(largest);
+        }
+    }
+
+    private void swap(int i, int j) {
+        int temp = heap[i];
+        heap[i] = heap[j];
+        heap[j] = temp;
+    }
+
+    public void printHeap() {
+        System.out.println(Arrays.toString(heap));
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter space-separated integers: ");
+        String inputLine = scanner.nextLine();
+        String[] inputTokens = inputLine.split(" ");
+        int[] inputArray = new int[inputTokens.length];
+        for (int i = 0; i < inputTokens.length; i++) {
+            inputArray[i] = Integer.parseInt(inputTokens[i]);
+        }
+
+        int k = 3; // Set k as desired (e.g., 3 for 3-ary heap)
+        KaryHeap maxHeap = new KaryHeap(inputArray, k);
+        maxHeap.printHeap();
+    }
+}
+
+
+
+####Winner tree####
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int numberOfScores = scanner.nextInt();
+        scanner.nextLine();  // consume the newline
+
+        List<Integer> tree = new ArrayList<>();
+        for (int i = 0; i < numberOfScores; i++) {
+            tree.add(scanner.nextInt());
+        }
+
+        Collections.sort(tree, Collections.reverseOrder());
+        System.out.println(tree);  // Output: [7, 5, 3] for input 3 5 3 7
+
+        if (!tree.isEmpty()) {
+            System.out.println("Winner: " + tree.get(0));  // Output: Winner: 7 for input 3 5 3 7
+        } else {
+            System.out.println("Winner: null");
+        }
+
+        scanner.close();
+    }
+}
+
+
+
+
